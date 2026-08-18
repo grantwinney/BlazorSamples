@@ -16,7 +16,7 @@
     <ul>
         @foreach (var astronaut in crew.OrderBy(a => a.Name))
         {
-            <li>@astronaut.Name</li>
+            <li><a href="https://en.wikipedia.org/wiki/@astronaut.Name">@astronaut.Name</a></li>
         }
     </ul>
 }
