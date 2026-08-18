@@ -8,38 +8,38 @@
     <a href="https://github.com/grantwinney/BlazorSamples/blob/master/BlazorSamples/Pages/ISS.razor">a list being populated by a call to an API</a>.
 </p>
 
-@foreach (var crew in Crews)
+@if (isLoading)
 {
-    <p style="font-weight:bold">
-        @crew.Key Crew Members (@crew.Count())
-    </p>
-    <ul>
-        @foreach (var astronaut in crew.OrderBy(a => a.Name))
-        {
-            <li><a href="https://en.wikipedia.org/wiki/@astronaut.Name">@astronaut.Name</a></li>
-        }
-    </ul>
+    <div><em>Loading crew names...</em></div>
+}
+else
+{
+    @foreach (var crew in Crews)
+    {
+        <p style="font-weight:bold">
+            @crew.Key Crew Members (@crew.Count())
+        </p>
+        <ul>
+            @foreach (var astronaut in crew.OrderBy(a => a.Name))
+            {
+                <li><a href="https://en.wikipedia.org/wiki/@astronaut.Name">@astronaut.Name</a></li>
+            }
+        </ul>
+    }
 }
 
 @code {
+    private bool isLoading = true;
     IEnumerable<IGrouping<string, Astronaut>> Crews { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var roster = await Http.GetFromJsonAsync<Roster>("https://corsproxy.io/?url=http://api.open-notify.org/astros.json");
-
         Crews = roster.People.GroupBy(x => x.Craft);
+
+        isLoading = false;
     }
 
-    public class Roster
-    {
-        public int Number { get; set; }
-        public List<Astronaut> People { get; set; }
-    }
-
-    public class Astronaut
-    {
-        public string Name { get; set; }
-        public string Craft { get; set; }
-    }
+    public record Roster(int Number, List<Astronaut> People);
+    public record Astronaut(string Name, string Craft);
 }
