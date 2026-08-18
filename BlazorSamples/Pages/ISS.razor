@@ -1,0 +1,45 @@
+﻿@page "/iss"
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<PageTitle>Space Crews</PageTitle>
+
+<p>This information isn't correct, unfortunately, but it still demonstrates
+    <a href="https://github.com/grantwinney/BlazorSamples/blob/master/BlazorSamples/Pages/ISS.razor">a list being populated by a call to an API</a>.
+</p>
+
+@foreach (var crew in Crews)
+{
+    <p style="font-weight:bold">
+        @crew.Key Crew Members (@crew.Count())
+    </p>
+    <ul>
+        @foreach (var astronaut in crew.OrderBy(a => a.Name))
+        {
+            <li>@astronaut.Name</li>
+        }
+    </ul>
+}
+
+@code {
+    IEnumerable<IGrouping<string, Astronaut>> Crews { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var roster = await Http.GetFromJsonAsync<Roster>("https://corsproxy.io/?url=http://api.open-notify.org/astros.json");
+
+        Crews = roster.People.GroupBy(x => x.Craft);
+    }
+
+    public class Roster
+    {
+        public int Number { get; set; }
+        public List<Astronaut> People { get; set; }
+    }
+
+    public class Astronaut
+    {
+        public string Name { get; set; }
+        public string Craft { get; set; }
+    }
+}

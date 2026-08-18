@@ -1,4 +1,5 @@
 ﻿@page "/counter"
+@inject IJSRuntime JS
 
 <PageTitle>Counter</PageTitle>
 
@@ -6,13 +7,51 @@
 
 <p role="status">Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+@if (currentCount > 10)
+{
+    <p>That's a high number...</p>
+}
+else
+{
+    <p>That's a low number...</p>
+}
+
+<p>Rolled over @(RollOverCount) times!</p>
+
+@* <textarea @oninput="OnChange"></textarea> *@
+
+<input type="number" @bind="IncrementAmount" />
+
+<p><button class="btn btn-primary" @onclick="IncrementCount">Click me</button></p>
+
+<p><button class="btn btn-primary" @onclick='async () => await JS.InvokeVoidAsync("alert", "Your message here")'>Red Alert!</button></p>
+
 
 @code {
+    private int previousCount = 0;
     private int currentCount = 0;
 
-    private void IncrementCount()
+    int RollOverCount = 0;
+
+    // private async void OnChange(ChangeEventArgs e)
+    // {
+    //     if (int.TryParse(e.Value?.ToString(), out int newValue))
+    //     {
+    //         IncrementAmount = newValue;
+    //     }
+    // }
+
+    private async void IncrementCount()
     {
-        currentCount++;
+        previousCount = currentCount;
+        currentCount = currentCount + IncrementAmount;
+
+        if (IncrementAmount > 0 && previousCount > currentCount || IncrementAmount < 0 && previousCount < currentCount)
+        {
+            RollOverCount++;
+        }
     }
+
+    [Parameter]
+    public int IncrementAmount { get; set; } = 1;
 }
