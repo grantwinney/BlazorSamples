@@ -1,0 +1,144 @@
+﻿@page "/launch"
+@inject HttpClient Http
+
+Poll for the next 5 rocket launches and create a table with the data.
+
+@if (isLoading)
+{
+    <div><em>Retrieving upcoming launches...</em></div>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Launch Name</th>
+                <th>Launch Time</th>
+                <th>Provider</th>
+                <th>Vehicle</th>
+                <th>Pad</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var launch in Launch.Result)
+            {
+                <tr>
+                    <td>@launch.Name</td>
+                    <td>@LaunchDateToLocal(@launch.T0)</td>
+                    <td>@launch.Provider.Name</td>
+                    <td>@launch.Vehicle.Name</td>
+                    <td>@launch.Pad.Name (@launch.Pad.Location.Name)</td>
+                    <td>@launch.Launch_Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p class="source">Source: <a href="https://www.rocketlaunch.live/api">Rocket Launch API - RocketLaunch.Live</a></p>
+}
+
+@code {
+    private bool isLoading = true;
+    LaunchApiResponse Launch { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var launchData = await Http.GetFromJsonAsync<LaunchApiResponse>("https://fdo.rocketlaunch.live/json/launches/next/5");
+        Launch = launchData;
+
+        isLoading = false;
+    }
+
+    string LaunchDateToLocal(string utcDate)
+    {
+        return DateTime.TryParse(utcDate, out var utcParsed) ? utcParsed.ToLocalTime().ToString() : "N/A";
+
+    }
+
+    public record LaunchApiResponse(
+      bool ValidAuth,
+      int Count,
+      int Limit,
+      int Total,
+      int LastPage,
+      List<LaunchItem> Result
+    );
+
+    public record LaunchItem(
+        int Id,
+        string CosparId,
+        string SortDate,
+        string Name,
+        Provider Provider,
+        Vehicle Vehicle,
+        Pad Pad,
+        List<Mission> Missions,
+        string MissionDescription,
+        string Launch_Description,
+        string WinOpen,
+        string T0,
+        string WinClose,
+        EstDate EstDate,
+        string DateStr,
+        List<Tag> Tags,
+        string Slug,
+        string WeatherSummary,
+        string WeatherTemp,
+        string WeatherCondition,
+        string WeatherWindMph,
+        string WeatherIcon,
+        string WeatherUpdated,
+        string Quicktext,
+        List<object> Media,
+        int? Result,
+        bool Suborbital,
+        string Modified
+    );
+
+    public record Provider(
+        int Id,
+        string Name,
+        string Slug
+    );
+
+    public record Vehicle(
+        int Id,
+        string Name,
+        int CompanyId,
+        string Slug
+    );
+
+    public record Pad(
+        int Id,
+        string Name,
+        Location Location
+    );
+
+    public record Location(
+        int Id,
+        string Name,
+        string State,
+        string Statename,
+        string Country,
+        string Slug
+    );
+
+    public record Mission(
+        int Id,
+        string Name,
+        string Description
+    );
+
+    public record EstDate(
+        int? Month,
+        int? Day,
+        int? Year,
+        int? Quarter
+    );
+
+    public record Tag(
+        int Id,
+        string Text
+    );
+}

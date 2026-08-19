@@ -1,0 +1,41 @@
+/* CSS for RocketLaunch component */
+
+table {
+    border-collapse: collapse;
+    border-style: solid;
+    border-width: thin;
+    margin: 20px 0px;
+}
+
+th {
+    background: #95f9b9;
+    border-style: solid;
+    border-color: black;
+    border-width: thin;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+td {
+    border-style: dotted;
+    border-color: black;
+    border-width: thin;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+td:not(:last-child) {
+    white-space: nowrap;
+}
+
+td:last-child {
+    font-size: smaller;
+}
+
+tbody tr:nth-child(even) {
+    background: lightgray;
+}
+
+.source {
+    font-style: italic;
+}

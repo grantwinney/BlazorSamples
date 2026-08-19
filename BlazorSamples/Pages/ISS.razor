@@ -26,6 +26,8 @@ else
             }
         </ul>
     }
+
+    <p style="font-style:italic">Source: <a href="http://open-notify.org/Open-Notify-API/">Open Notify API</a></p>
 }
 
 @code {
@@ -40,6 +42,6 @@ else
         isLoading = false;
     }
 
-    public record Roster(int Number, List<Astronaut> People);
-    public record Astronaut(string Name, string Craft);
+    record Roster(int Number, List<Astronaut> People);
+    record Astronaut(string Name, string Craft);
 }
